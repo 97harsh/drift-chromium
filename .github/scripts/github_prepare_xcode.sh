@@ -5,7 +5,13 @@ shopt -s extglob
 
 BASE_XCODE_PATH=/Applications/Xcode_26.5.app
 
+# Drift: free runner images may not have 26.5 yet; use the newest Xcode 26 present.
 if [ ! -e "$BASE_XCODE_PATH" ]; then
+  BASE_XCODE_PATH="$(ls -d /Applications/Xcode_26.*.app 2>/dev/null | sort -V | tail -1 || true)"
+  echo "Xcode 26.5 not found; using ${BASE_XCODE_PATH:-none}"
+fi
+
+if [ -z "$BASE_XCODE_PATH" ] || [ ! -e "$BASE_XCODE_PATH" ]; then
   echo "Failed to find a suitable version of Xcode"
   exit 1
 fi

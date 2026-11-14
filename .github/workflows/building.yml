@@ -22,6 +22,8 @@ env:
   PROD_MACOS_NOTARIZATION_APPLE_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_APPLE_ID }}
   PROD_MACOS_NOTARIZATION_TEAM_ID: ${{ secrets.PROD_MACOS_NOTARIZATION_TEAM_ID }}
   PROD_MACOS_NOTARIZATION_PWD: ${{ secrets.PROD_MACOS_NOTARIZATION_PWD }}
+  # Drift: without a Developer ID certificate, sign ad-hoc and skip notarization.
+  MACOS_AD_HOC_SIGNING: ${{ secrets.PROD_MACOS_CERTIFICATE == '' && '1' || '0' }}
 
 jobs:
   retrieve-resources:

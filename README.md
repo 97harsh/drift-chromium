@@ -1,3 +1,5 @@
+> **Drift fork.** This is the Chromium build pipeline for [Drift](https://github.com/97harsh/drift-browser), forked from [ungoogled-chromium-macos](https://github.com/ungoogled-software/ungoogled-chromium-macos) (BSD-3). It is tuned to build on GitHub's free macOS runners: chained resumable jobs, Apple Silicon only, ad-hoc signed. Drift's branding and patches come next. See Drift's [`docs/CHROMIUM_PLAN.md`](https://github.com/97harsh/drift-browser/blob/main/docs/CHROMIUM_PLAN.md).
+
 # ungoogled-chromium-macos
 
 macOS packaging for [ungoogled-chromium](//github.com/ungoogled-software/ungoogled-chromium).
