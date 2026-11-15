@@ -33,6 +33,9 @@ fi
 rm -rf third_party/devtools-frontend/src/node_modules/esbuild
 ln -s "$_esbuild_module" third_party/devtools-frontend/src/node_modules/esbuild
 
+# Drift: apply branding (name, icons, strings) before GN reads BRANDING.
+"$_root_dir/drift/apply_branding.sh" "$_src_dir"
+
 ./tools/gn/bootstrap/bootstrap.py -o out/Default/gn --skip-generate-buildfiles
 ./tools/rust/build_bindgen.py --skip-test
 

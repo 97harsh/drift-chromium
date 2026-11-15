@@ -1,0 +1,41 @@
+# Drift: apply the branding to the real Chromium files it touches and verify the
+# result in a few minutes, instead of discovering problems hours into a build.
+name: Drift branding check
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'drift/**'
+      - '.github/workflows/branding-check.yml'
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Select newest Xcode 26 (for actool)
+        run: |
+          X="$(ls -d /Applications/Xcode_26.*.app | sort -V | tail -1)"
+          echo "Using $X"
+          sudo xcode-select --switch "$X"
+          xcrun actool --version | head -3
+      - name: Fetch Chromium branding inputs
+        run: drift/test/fetch_test_src.sh "$RUNNER_TEMP/orig"
+      - name: Apply branding
+        run: |
+          cp -R "$RUNNER_TEMP/orig" "$RUNNER_TEMP/branded"
+          drift/apply_branding.sh "$RUNNER_TEMP/branded"
+      - name: Verify
+        run: python3 drift/test/verify_branding.py "$RUNNER_TEMP/branded" "$RUNNER_TEMP/orig"
+      - name: Upload branded icons for inspection
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: drift-branding-icons
+          path: |
+            ${{ runner.temp }}/branded/chrome/app/theme/chromium/mac/
+            ${{ runner.temp }}/branded/chrome/app/theme/chromium/product_logo_256.png

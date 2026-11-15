@@ -67,6 +67,8 @@ python3 "$_main_repo/utils/prune_binaries.py" "$_src_dir" "$_main_repo/pruning.l
 python3 "$_main_repo/utils/patches.py" apply "$_src_dir" "$_main_repo/patches" "$_root_dir/patches"
 
 python3 "$_main_repo/utils/domain_substitution.py" apply -r "$_main_repo/domain_regex.list" -f "$_main_repo/domain_substitution.list" "$_src_dir"
+# Drift: apply branding (name, icons, strings) before GN reads BRANDING
+"$_root_dir/drift/apply_branding.sh" "$_src_dir"
 # Set build flags
 cat "$_main_repo/flags.gn" "$_root_dir/flags.macos.gn" > "$_src_dir/out/Default/args.gn"
 
@@ -106,6 +108,6 @@ ln -s "$_esbuild_module" third_party/devtools-frontend/src/node_modules/esbuild
 
 ./out/Default/gn gen out/Default --fail-on-unused-args
 
-ninja -C out/Default chrome chromedriver
+ninja -C out/Default chrome
 
 CHROMIUM_SRC_DIR="$_src_dir" "$_root_dir/sign_and_package_app.sh"

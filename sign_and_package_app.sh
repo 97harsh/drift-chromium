@@ -4,8 +4,12 @@ set -euo pipefail
 
 _root_dir="$(dirname "$(greadlink -f "$0")")"
 _src_dir="${CHROMIUM_SRC_DIR:-$_root_dir/build/src}"
-_app="$_src_dir/out/Default/Chromium.app"
-_framework="$_app/Contents/Frameworks/Chromium Framework.framework"
+# Drift: the product name comes from the branding file (Chromium when unbranded).
+_branding="$_src_dir/chrome/app/theme/chromium/BRANDING"
+_product="$(grep -E '^PRODUCT_FULLNAME=' "$_branding" 2>/dev/null | cut -d= -f2-)"
+_product="${_product:-Chromium}"
+_app="$_src_dir/out/Default/${_product}.app"
+_framework="$_app/Contents/Frameworks/${_product} Framework.framework"
 _helpers="$_framework/Helpers"
 _libraries="$_framework/Libraries"
 _pkg_dmg="$_src_dir/chrome/installer/mac/pkg-dmg"
@@ -47,15 +51,15 @@ xattr -cs "$_app"
 
 # Sign the binary
 sign --identifier chrome_crashpad_handler --options=restrict,library,runtime,kill "$_helpers/chrome_crashpad_handler"
-sign --identifier "$_bundle_id.helper" --options restrict,library,runtime,kill "$_helpers/Chromium Helper.app"
-sign --identifier "$_bundle_id.helper.renderer" --options restrict,kill,runtime --entitlements "$_root_dir/entitlements/helper-renderer-entitlements.plist" "$_helpers/Chromium Helper (Renderer).app"
-sign --identifier "$_bundle_id.helper" --options restrict,kill,runtime --entitlements "$_root_dir/entitlements/helper-gpu-entitlements.plist" "$_helpers/Chromium Helper (GPU).app"
-sign --identifier "$_bundle_id.framework.AlertNotificationService" --options restrict,library,runtime,kill "$_helpers/Chromium Helper (Alerts).app"
-if [[ -d "$_helpers/Chromium Helper (Aperitif).app" ]]; then
-  sign --identifier "$_bundle_id.helper" --options restrict,library,runtime,kill "$_helpers/Chromium Helper (Aperitif).app"
-  sign --identifier "$_bundle_id.helper.renderer" --options restrict,kill,runtime --entitlements "$_root_dir/entitlements/helper-renderer-entitlements.plist" "$_helpers/Chromium Helper (Aperitif Renderer).app"
-  sign --identifier "$_bundle_id.helper" --options restrict,kill,runtime --entitlements "$_root_dir/entitlements/helper-gpu-entitlements.plist" "$_helpers/Chromium Helper (Aperitif GPU).app"
-  sign --identifier "$_bundle_id.framework.AlertNotificationService" --options restrict,library,runtime,kill "$_helpers/Chromium Helper (Aperitif Alerts).app"
+sign --identifier "$_bundle_id.helper" --options restrict,library,runtime,kill "$_helpers/${_product} Helper.app"
+sign --identifier "$_bundle_id.helper.renderer" --options restrict,kill,runtime --entitlements "$_root_dir/entitlements/helper-renderer-entitlements.plist" "$_helpers/${_product} Helper (Renderer).app"
+sign --identifier "$_bundle_id.helper" --options restrict,kill,runtime --entitlements "$_root_dir/entitlements/helper-gpu-entitlements.plist" "$_helpers/${_product} Helper (GPU).app"
+sign --identifier "$_bundle_id.framework.AlertNotificationService" --options restrict,library,runtime,kill "$_helpers/${_product} Helper (Alerts).app"
+if [[ -d "$_helpers/${_product} Helper (Aperitif).app" ]]; then
+  sign --identifier "$_bundle_id.helper" --options restrict,library,runtime,kill "$_helpers/${_product} Helper (Aperitif).app"
+  sign --identifier "$_bundle_id.helper.renderer" --options restrict,kill,runtime --entitlements "$_root_dir/entitlements/helper-renderer-entitlements.plist" "$_helpers/${_product} Helper (Aperitif Renderer).app"
+  sign --identifier "$_bundle_id.helper" --options restrict,kill,runtime --entitlements "$_root_dir/entitlements/helper-gpu-entitlements.plist" "$_helpers/${_product} Helper (Aperitif GPU).app"
+  sign --identifier "$_bundle_id.framework.AlertNotificationService" --options restrict,library,runtime,kill "$_helpers/${_product} Helper (Aperitif Alerts).app"
 fi
 sign --identifier app_mode_loader --options restrict,library,runtime,kill "$_helpers/app_mode_loader"
 sign --identifier web_app_shortcut_copier --options restrict,library,runtime,kill "$_helpers/web_app_shortcut_copier"
@@ -193,5 +197,5 @@ fi
 "$_pkg_dmg" \
   --sourcefile --source "$_app" \
   --target "$_target_dmg" \
-  --volname Chromium --symlink /Applications:/Applications \
+  --volname "$_product" --symlink /Applications:/Applications \
   --format UDBZ --verbosity 2

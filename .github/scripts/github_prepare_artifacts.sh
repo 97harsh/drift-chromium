@@ -17,7 +17,9 @@ if [[ -f "$_root_dir/build_finished_$_target_cpu.log" ]] ; then
   _ungoogled_revision="$(cat "$_root_dir/ungoogled-chromium/revision.txt")"
   _package_revision="$(cat "$_root_dir/revision.txt")"
 
-  _file_name="ungoogled-chromium_${_chromium_version}-${_ungoogled_revision}.${_package_revision}_${_target_cpu}-macos.dmg"
+  # Drift: name the disk image after the branded product.
+  _product="$(grep -E '^PRODUCT_FULLNAME=' "$_src_dir/chrome/app/theme/chromium/BRANDING" | cut -d= -f2-)"
+  _file_name="${_product:-Chromium}_${_chromium_version}-${_ungoogled_revision}.${_package_revision}_${_target_cpu}-macos.dmg"
   _hash_name="${_file_name}.hashes.md"
 
   cd "$_src_dir"

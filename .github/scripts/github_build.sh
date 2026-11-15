@@ -24,7 +24,7 @@ echo "status=running" >> $GITHUB_OUTPUT
 
 set +e
 
-timeout -k 7m -s SIGTERM ${_remaining_time:-19680}s ninja -C out/Default chrome chromedriver # 328 m as default $_remaining_time
+timeout -k 7m -s SIGTERM ${_remaining_time:-19680}s ninja -C out/Default chrome  # Drift: chromedriver (testing tool) not built # 328 m as default $_remaining_time
 
 _error_code="${?}"
 if [[ "$_error_code" -eq 124 ]]; then
