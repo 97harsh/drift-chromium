@@ -14,6 +14,9 @@ if [[ -f "$_root_dir/epoch_job_start.txt" ]]; then
   _remaining_time=$(( 360*60 - 60*60 - $(date +%s) + epoch_job_start ))
 fi
 
+# Drift: resumed jobs need esbuild re-linked (see github_ensure_esbuild.sh).
+"$_root_dir/github_ensure_esbuild.sh"
+
 cd "$_src_dir"
 
 echo $(date +%s) | tee -a "$_root_dir/build_times_$_target_cpu.log"
